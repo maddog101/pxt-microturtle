@@ -15,7 +15,7 @@ namespace turtle {
     let _brightness: number;
     let _penMode: TurtlePenMode = TurtlePenMode.Up;
     let _img: Image;
-    let _delay = 250;
+    let _delay = 250; // ms delay, default for 4 steps per second
 
     function init() {
         if (!_img) {
@@ -140,6 +140,23 @@ namespace turtle {
         _direction = 3;
     }
 
+    /**
+     * Clear the _img history of the turtle trail, an oversight in original library. 
+     */
+    //% blockGap=8
+    //% blockId=turtleClear block="clear turtle trail"
+    export function clearTrail(): void {
+        _img = images.createImage(`
+                . . . . .
+                . . . . .
+                . . . . .
+                . . . . .
+                . . . . .
+                `)
+        // re-using paint() will plot the cleared data instead of using clearScreen, show turtle position and run delay.
+        paint();
+    }
+    
     /** 
      * Sets the brightness
      * @param brightness the brightness of the trail left by the turtle, eg: 128
@@ -154,7 +171,7 @@ namespace turtle {
     }
 
     /**
-     * Define the steps per second
+     * Define the steps per second, with a min of 1 and max of 50, the delay ranges from 20ms to 1000ms
      * @param stepsPerSecond steps per second, eg: 25
      */
     //% blockGap=8
@@ -164,7 +181,12 @@ namespace turtle {
     export function setSpeed(stepsPerSecond: number): void {
         if (stepsPerSecond <= 0) return;
 
-        _delay = Math.max(1, Math.min(50, Math.idiv(1000, stepsPerSecond)));
+        // bad algorithm never worked...
+        //_delay = Math.max(1, Math.min(50, Math.idiv(1000, stepsPerSecond)));
+        // do this instead:
+        //_delay = Math.max(20, Math.min(1000, Math.idiv(1000, stepsPerSecond)));
+        // or the cleaner approach:
+        _delay = Math.constrain(Math.idiv(1000, stepsPerSecond), 20, 1000);
     }
 
     // auto-initialize
